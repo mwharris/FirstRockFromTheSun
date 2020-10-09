@@ -535,9 +535,9 @@
                 "CLOTHINGSYSTEMRUNTIMEINTERFACE_API=",
                 "AUDIOMIXERCORE_VTABLE=DLLIMPORT_VTABLE",
                 "AUDIOMIXERCORE_API=",
-                "UE_PROJECT_NAME=ToonTanks",
-                "TOONTANKS_VTABLE=DLLEXPORT_VTABLE",
-                "TOONTANKS_API="
+                "UE_PROJECT_NAME=FirstRockFromTheSun",
+                "FIRSTROCKFROMTHESUN_VTABLE=DLLEXPORT_VTABLE",
+                "FIRSTROCKFROMTHESUN_API="
             ],
             "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.24.28314/bin/Hostx64/x64/cl.exe",
             "cStandard": "c11",

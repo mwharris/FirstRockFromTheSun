@@ -18,5 +18,6 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+	void Move(float AxisValue);
 
 };
