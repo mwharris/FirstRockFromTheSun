@@ -1,6 +1,7 @@
 #include "MainCharacter.h"
 #include "Components/InputComponent.h"
 #include "DrawDebugHelpers.h"
+#include "Kismet/GameplayStatics.h"
 
 AMainCharacter::AMainCharacter()
 {
@@ -35,7 +36,7 @@ void AMainCharacter::Move(float AxisValue)
 }
 
 // Perform the Solar Flare raycast towards our player and deal damage if necessary
-void AMainCharacter::DoSolarFlareRaycast() 
+void AMainCharacter::DoSolarFlareRaycast(float DeltaTime) 
 {
 	// Perform the raycast
 	FHitResult Hit;
@@ -46,9 +47,8 @@ void AMainCharacter::DoSolarFlareRaycast()
 		ECC_Visibility
 	);
 	// Check if the sun's rays hit the player
-	if (bSuccess && Hit.Actor == this)
+	if (bSuccess && Hit.GetActor() == this)
 	{
-		// TODO: Damage the player
+		UGameplayStatics::ApplyDamage(Hit.GetActor(), FlareDamage * DeltaTime, GetInstigatorController(), this, DamageType);
 	}
-	DrawDebugLine(GetWorld(), FlareRaycastPoint->GetComponentLocation(), TempMesh->GetComponentLocation(), FColor::Yellow);
 }

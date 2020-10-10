@@ -4,6 +4,8 @@
 #include "GameFramework/Character.h"
 #include "MainCharacter.generated.h"
 
+class UHealthComponent;
+
 UCLASS()
 class FIRSTROCKFROMTHESUN_API AMainCharacter : public ACharacter
 {
@@ -13,8 +15,8 @@ public:
 	AMainCharacter();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	
-	void DoSolarFlareRaycast();
+
+	void DoSolarFlareRaycast(float DeltaTime);
 
 protected:
 	virtual void BeginPlay() override;
@@ -24,6 +26,12 @@ private:
 	UStaticMeshComponent* TempMesh;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USceneComponent* FlareRaycastPoint;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UHealthComponent* HealthComponent;
+	UPROPERTY(EditDefaultsOnly, Category = "Damage")
+	TSubclassOf<UDamageType> DamageType;
+	UPROPERTY(EditAnywhere, Category = "Damage")
+	float FlareDamage = 1.f;
 
 	void Move(float AxisValue);
 

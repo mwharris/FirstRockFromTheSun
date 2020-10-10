@@ -3,6 +3,11 @@
 #include "TimerManager.h"
 #include "FirstRockFromTheSun/Characters/MainCharacter.h"
 
+ABP_GameMode::ABP_GameMode() 
+{
+    PrimaryActorTick.bCanEverTick = true;
+}
+
 void ABP_GameMode::BeginPlay()
 {
 	Super::BeginPlay();
@@ -18,7 +23,7 @@ void ABP_GameMode::Tick(float DeltaTime)
     // If our solar flare is active, tell the player to raycast
     if (SolarFlareActive) 
     {
-        Player->DoSolarFlareRaycast();
+        Player->DoSolarFlareRaycast(DeltaTime);
     }
 }
 

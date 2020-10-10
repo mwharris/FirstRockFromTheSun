@@ -12,6 +12,7 @@ class FIRSTROCKFROMTHESUN_API ABP_GameMode : public AGameModeBase
 	GENERATED_BODY()
 
 public:
+	ABP_GameMode();
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable, Category="Solar Flare")
