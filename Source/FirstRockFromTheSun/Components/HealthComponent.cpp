@@ -8,18 +8,10 @@ UHealthComponent::UHealthComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-/*
-// TODO: Is this needed?
-void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-}
-*/
-
 void UHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
+	// Initialize our starting HP
 	CurrentHealth = MaxHealth;
 	// Get a reference to our custom game mode
 	GameModeRef = Cast<ABP_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
@@ -29,16 +21,9 @@ void UHealthComponent::BeginPlay()
 
 void UHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser) 
 {
-	UE_LOG(LogTemp, Warning, TEXT("Taking Damage!"));
-	
 	CurrentHealth -= Damage;
-	
 	if (CurrentHealth <= 0) 
 	{
-		// Die
-	}
-	else
-	{
-		// Keep on truckin'
+		GameModeRef->HandleGameOver(true);
 	}
 }

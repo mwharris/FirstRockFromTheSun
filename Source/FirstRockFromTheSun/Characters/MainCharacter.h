@@ -5,6 +5,7 @@
 #include "MainCharacter.generated.h"
 
 class UHealthComponent;
+class ABP_GameMode;
 
 UCLASS()
 class FIRSTROCKFROMTHESUN_API AMainCharacter : public ACharacter
@@ -17,6 +18,8 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void DoSolarFlareRaycast(float DeltaTime);
+	void HandleGameOver(bool PlayerDied);
+	bool GetIsAlive() const;
 
 protected:
 	virtual void BeginPlay() override;
@@ -33,11 +36,14 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Damage")
 	float FlareDamage = 1.f;
 
+	ABP_GameMode* GameModeRef;
 	UCharacterMovementComponent* MovementComponent;
 	UCapsuleComponent* CapsuleComponent;
+	bool IsAlive = true;
 
 	void Move(float AxisValue);
 	void CustomJump();
 	void WallJump();
+	void ToggleMissionList();
 
 };

@@ -3,6 +3,7 @@
 #include "Components/InputComponent.h"
 #include "DrawDebugHelpers.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "FirstRockFromTheSun/GameModes/BP_GameMode.h"
 #include "Kismet/GameplayStatics.h"
 
 AMainCharacter::AMainCharacter()
@@ -19,6 +20,7 @@ AMainCharacter::AMainCharacter()
 void AMainCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	GameModeRef = Cast<ABP_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	MovementComponent = GetCharacterMovement();
 	CapsuleComponent = GetCapsuleComponent();
 }
@@ -28,17 +30,22 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAxis(TEXT("Horizontal"), this, &AMainCharacter::Move);
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &AMainCharacter::CustomJump);
+	PlayerInputComponent->BindAction(TEXT("OpenMissionList"), IE_Pressed, this, &AMainCharacter::ToggleMissionList);
 }
 
 void AMainCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	// DrawDebugLine(GetWorld(), FlareRaycastPoint->GetComponentLocation(), TempMesh->GetComponentLocation(), FColor::Yellow);
 }
 
 void AMainCharacter::Move(float AxisValue) 
 {
 	AddMovementInput(GetActorForwardVector() * AxisValue);
+}
+
+void AMainCharacter::ToggleMissionList() 
+{
+	GameModeRef->ToggleMissionList();
 }
 
 void AMainCharacter::CustomJump() 
@@ -82,17 +89,28 @@ void AMainCharacter::WallJump()
 // Perform the Solar Flare raycast towards our player and deal damage if necessary
 void AMainCharacter::DoSolarFlareRaycast(float DeltaTime) 
 {
-	// Perform the raycast
+	// Perform the raycast to the center of the player
 	FHitResult Hit;
-	bool bSuccess = GetWorld()->LineTraceSingleByChannel(
-		Hit, 
-		FlareRaycastPoint->GetComponentLocation(), 
-		TempMesh->GetComponentLocation(), 
-		ECC_Visibility
-	);
+	FVector MeshLoc = TempMesh->GetComponentLocation();
+	FVector Start = FlareRaycastPoint->GetComponentLocation();
+	FVector End = FVector(MeshLoc.X, MeshLoc.Y, MeshLoc.Z + CapsuleComponent->GetScaledCapsuleRadius());
 	// Check if the sun's rays hit the player
-	if (bSuccess && Hit.GetActor() == this)
+	bool bSuccess = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility);
+	if (bSuccess && Hit.GetActor())
 	{
-		UGameplayStatics::ApplyDamage(Hit.GetActor(), FlareDamage * DeltaTime, GetInstigatorController(), this, DamageType);
+		if (Hit.GetActor() == this) 
+		{
+			UGameplayStatics::ApplyDamage(Hit.GetActor(), FlareDamage * DeltaTime, GetInstigatorController(), this, DamageType);
+		}
 	}
+}
+
+void AMainCharacter::HandleGameOver(bool PlayerDied) 
+{
+	IsAlive = !PlayerDied;
+}
+
+bool AMainCharacter::GetIsAlive() const
+{
+	return IsAlive;
 }
