@@ -1,0 +1,18 @@
+-------------------
+GAME JAM TO-DO
+-------------------
+- Warning of incoming solar flare
+- Missions, Tasks, Trigger Volumes, To-Do List
+- Audio
+	- Woosh / burning sound
+	- Alarm for incoming solar flare
+	- Walking / Jumping
+	- Music?...
+- Level Design
+- Fixes
+	- The collision on the solar flare raycast is a little off
+	- Make the sun more red/orange
+	- Brightness should increase/decrease over time
+	- Play around with Light Source intensity during solar flare moments
+		- Find a good ratio between Sun Brightness and Light Intensity
+		- We want the player to still see the cover they are hiding behind

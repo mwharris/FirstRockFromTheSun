@@ -33,6 +33,11 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Damage")
 	float FlareDamage = 1.f;
 
+	UCharacterMovementComponent* MovementComponent;
+	UCapsuleComponent* CapsuleComponent;
+
 	void Move(float AxisValue);
+	void CustomJump();
+	void WallJump();
 
 };
