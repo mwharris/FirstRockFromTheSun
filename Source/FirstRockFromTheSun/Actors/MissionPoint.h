@@ -29,11 +29,17 @@ private:
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* BoxCollider = nullptr;
 	UPROPERTY(EditAnywhere)
-	UTextRenderComponent* TextRenderComp;
+	UTextRenderComponent* TitleTextRender;
+	UPROPERTY(EditAnywhere)
+	UTextRenderComponent* SuccessTextRender;
 	UPROPERTY(EditAnywhere)
 	int32 MissionNumber = 0;
 	UPROPERTY(EditAnywhere)
+	bool FinalMission = false;
+	UPROPERTY(EditAnywhere)
 	FString Objective = "Do something";
+	UPROPERTY(EditAnywhere)
+	FString ItemName = "tacos";
 	UPROPERTY(EditAnywhere)
 	FString CharacterName = "Malibel";
 	
@@ -41,6 +47,11 @@ private:
 	bool MissionComplete = false;
 	
 	AMainCharacter* Player;
+
+	FString Dash = TEXT("- ");
+	FString From = TEXT(" from ");
+	FString House = TEXT(" house.");
+	FString Done = TEXT(" (DONE)");
 
 	UFUNCTION()
 	void OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, 

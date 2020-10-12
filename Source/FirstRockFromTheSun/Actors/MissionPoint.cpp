@@ -11,8 +11,12 @@ AMissionPoint::AMissionPoint()
 	BoxCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Collider"));
 	SetRootComponent(BoxCollider);
 
-	TextRenderComp = CreateDefaultSubobject<UTextRenderComponent>(TEXT("Text Render"));
-	TextRenderComp->SetupAttachment(RootComponent);
+	TitleTextRender = CreateDefaultSubobject<UTextRenderComponent>(TEXT("Title Text Render"));
+	TitleTextRender->SetupAttachment(RootComponent);
+
+	SuccessTextRender = CreateDefaultSubobject<UTextRenderComponent>(TEXT("Success Text Render"));
+	SuccessTextRender->SetVisibility(false);
+	SuccessTextRender->SetupAttachment(RootComponent);
 }
 
 void AMissionPoint::BeginPlay()
@@ -22,8 +26,17 @@ void AMissionPoint::BeginPlay()
 	Player = Cast<AMainCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 	// Hook into the component overlap event
 	BoxCollider->OnComponentBeginOverlap.AddDynamic(this, &AMissionPoint::OnBeginOverlap);
-	
-	TextRenderComp->SetText(FText::FromString(CharacterName.Append("'s House")));
+	// Set our text render values
+	if (FinalMission) 
+	{
+		TitleTextRender->SetText(FText::FromString(TEXT("Your House")));
+		SuccessTextRender->SetText(FText::FromString(TEXT("tacos get!")));
+	}
+	else
+	{
+		TitleTextRender->SetText(FText::FromString(CharacterName + TEXT("'s House")));
+		SuccessTextRender->SetText(FText::FromString(ItemName + TEXT(" get!")));
+	}
 }
 
 void AMissionPoint::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
@@ -36,16 +49,25 @@ void AMissionPoint::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* 
 		if (OtherActor && Player && OtherActor == Player) 
 		{
 			MissionComplete = true;
+			SuccessTextRender->SetVisibility(true);
 		}
 	}
 }
 
 FString AMissionPoint::GetMissionListText() const
 {
-	FString ReturnString = FString("- ").Append(Objective).Append(" from ").Append(CharacterName);
+	FString ReturnString;
+	if (FinalMission)
+	{
+		ReturnString = "Go home and make tacos!";
+	} 
+	else 
+	{
+		ReturnString = Dash + Objective + TEXT(" ") + ItemName + From + CharacterName;
+	}
 	if (MissionComplete)
 	{
-		ReturnString.Append(" (DONE)");
+		ReturnString += Done;
 	}
 	return ReturnString;
 }
