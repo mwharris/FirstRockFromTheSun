@@ -49,6 +49,7 @@ private:
 	TArray<AMissionPoint*> MissionPoints;
 	FTimerHandle FlareTimerHandle;
 	UAudioComponent* AlarmSoundComponent;
+	bool GameStarted = false;
 
 	// Variables for various game states
 	bool CountdownActive = false;

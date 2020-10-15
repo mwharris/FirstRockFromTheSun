@@ -17,18 +17,28 @@ void ABP_GameMode::BeginPlay()
     Player = Cast<AMainCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
     // Get references to all Mission Points in the level
     LoadMissionPoints();
-    // Start the initial solar flare timer
-    StartDowntime();
 }
 
 void ABP_GameMode::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-    CheckWinCondition();
-    // If our solar flare is active, tell the player to raycast
-    if (SolarFlareActive) 
+    // Get the name of the current level so we don't run logic on the Main Menu
+    FString CurrLevelName = UGameplayStatics::GetCurrentLevelName(GetWorld());
+    // Don't bother checking this stuff until we're playing the game
+    if (GameStarted) 
     {
-        Player->DoSolarFlareRaycast(DeltaTime);
+        CheckWinCondition();
+        // If our solar flare is active, tell the player to raycast
+        if (SolarFlareActive) 
+        {
+            Player->DoSolarFlareRaycast(DeltaTime);
+        }
+    }
+    // Start our timers only when we start the play level
+    else if (CurrLevelName == TEXT("GameMap"))
+    {
+        GameStarted = true;
+        StartDowntime();
     }
 }
 
