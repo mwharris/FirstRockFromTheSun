@@ -18,6 +18,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	void HandleGameOver(bool PlayerDied);
 	void ToggleMissionList();
+	bool ShouldFinalMissionComplete() const;
 
 	UFUNCTION(BlueprintCallable, Category="Solar Flare")
 	bool IsSolarFlareActive() const;

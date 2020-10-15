@@ -7,6 +7,7 @@
 class AMainCharacter;
 class UBoxComponent;
 class UTextRenderComponent;
+class ABP_GameMode;
 
 UCLASS()
 class FIRSTROCKFROMTHESUN_API AMissionPoint : public AActor
@@ -15,12 +16,14 @@ class FIRSTROCKFROMTHESUN_API AMissionPoint : public AActor
 	
 public:	
 	AMissionPoint();
-
-	int32 GetMissionNumber() const;
+	
 	bool GetMissionComplete() const;
+	bool IsFinalMission() const;
 
 	UFUNCTION(BlueprintCallable, Category="Mission")
 	FString GetMissionListText() const;
+	UFUNCTION(BlueprintCallable, Category="Mission")
+	int32 GetMissionNumber() const;
 
 protected:
 	virtual void BeginPlay() override;
@@ -32,7 +35,7 @@ private:
 	UTextRenderComponent* TitleTextRender;
 	UPROPERTY(EditAnywhere)
 	UTextRenderComponent* SuccessTextRender;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
 	int32 MissionNumber = 0;
 	UPROPERTY(EditAnywhere)
 	bool FinalMission = false;
@@ -46,9 +49,8 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	bool MissionComplete = false;
 	
+	ABP_GameMode* GameModeRef;
 	AMainCharacter* Player;
-
-	FString Dash = TEXT("- ");
 	FString From = TEXT(" from ");
 	FString House = TEXT(" house.");
 	FString Done = TEXT(" (DONE)");

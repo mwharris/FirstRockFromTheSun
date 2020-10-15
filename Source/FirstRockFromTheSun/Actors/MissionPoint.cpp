@@ -2,6 +2,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/TextRenderComponent.h"
 #include "FirstRockFromTheSun/Characters/MainCharacter.h"
+#include "FirstRockFromTheSun/GameModes/BP_GameMode.h"
 #include "Kismet/GameplayStatics.h"
 
 AMissionPoint::AMissionPoint()
@@ -22,8 +23,9 @@ AMissionPoint::AMissionPoint()
 void AMissionPoint::BeginPlay()
 {
 	Super::BeginPlay();
-    // Get a reference to our player
+    // Get a reference to our player and game mode
 	Player = Cast<AMainCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	GameModeRef = Cast<ABP_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	// Hook into the component overlap event
 	BoxCollider->OnComponentBeginOverlap.AddDynamic(this, &AMissionPoint::OnBeginOverlap);
 	// Set our text render values
@@ -42,28 +44,32 @@ void AMissionPoint::BeginPlay()
 void AMissionPoint::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
 		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) 
 {
-	// Ignore the event if we're already completed this mission
-	if (!MissionComplete) 
+	// Don't finish the final mission until all other missions are completed
+	if (!FinalMission || GameModeRef->ShouldFinalMissionComplete()) 
 	{
-		// If it was the player that overlapped, mark the mission as complete
-		if (OtherActor && Player && OtherActor == Player) 
+		if (!MissionComplete) 
 		{
-			MissionComplete = true;
-			SuccessTextRender->SetVisibility(true);
+			// If it was the player that overlapped, mark the mission as complete
+			if (OtherActor && Player && OtherActor == Player) 
+			{
+				MissionComplete = true;
+				SuccessTextRender->SetVisibility(true);
+			}
 		}
 	}
 }
 
 FString AMissionPoint::GetMissionListText() const
 {
+	FString MissionNumStr = FString::FromInt(MissionNumber) + TEXT(". ");
 	FString ReturnString;
 	if (FinalMission)
 	{
-		ReturnString = "Go home and make tacos!";
+		ReturnString = MissionNumStr + "Go home and make tacos!";
 	} 
 	else 
 	{
-		ReturnString = Dash + Objective + TEXT(" ") + ItemName + From + CharacterName;
+		ReturnString = MissionNumStr + Objective + TEXT(" ") + ItemName + From + CharacterName;
 	}
 	if (MissionComplete)
 	{
@@ -80,4 +86,9 @@ int32 AMissionPoint::GetMissionNumber() const
 bool AMissionPoint::GetMissionComplete() const
 {
 	return MissionComplete;
+}
+
+bool AMissionPoint::IsFinalMission() const
+{
+	return FinalMission;
 }

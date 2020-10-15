@@ -27,3 +27,8 @@ void UHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const UDam
 		GameModeRef->HandleGameOver(true);
 	}
 }
+
+float UHealthComponent::GetCurrentHealth() const
+{
+	return CurrentHealth;
+}

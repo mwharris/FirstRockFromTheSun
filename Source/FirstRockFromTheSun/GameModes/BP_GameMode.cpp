@@ -113,6 +113,20 @@ void ABP_GameMode::HandleGameOver(bool PlayerDied)
     }
 }
 
+// The Final Mission should only complete when all other missions are completed
+bool ABP_GameMode::ShouldFinalMissionComplete() const
+{
+    bool AllOtherComplete = false;
+    for (AMissionPoint* MissionPoint : MissionPoints) 
+    {
+        if (!MissionPoint->IsFinalMission() && !MissionPoint->GetMissionComplete()) 
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 void ABP_GameMode::ToggleMissionList() 
 {
     MissionListOpen = !MissionListOpen;

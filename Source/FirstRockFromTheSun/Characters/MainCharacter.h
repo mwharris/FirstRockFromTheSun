@@ -28,6 +28,8 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* TempMesh;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	USceneComponent* RotatePoint;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USceneComponent* FlareRaycastPoint;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UHealthComponent* HealthComponent;
@@ -35,6 +37,10 @@ private:
 	TSubclassOf<UDamageType> DamageType;
 	UPROPERTY(EditAnywhere, Category = "Damage")
 	float FlareDamage = 1.f;
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float RotationRate = 0.75f;
+	UPROPERTY(VisibleAnywhere, Category = "Movement")
+	float RotationAmount = 0.f;
 
 	ABP_GameMode* GameModeRef;
 	UCharacterMovementComponent* MovementComponent;
@@ -45,5 +51,6 @@ private:
 	void CustomJump();
 	void WallJump();
 	void ToggleMissionList();
+	void RestartLevel();
 
 };

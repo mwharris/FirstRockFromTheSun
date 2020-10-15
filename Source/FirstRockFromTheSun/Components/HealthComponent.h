@@ -13,7 +13,8 @@ class FIRSTROCKFROMTHESUN_API UHealthComponent : public UActorComponent
 
 public:	
 	UHealthComponent();
-	// virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	float GetCurrentHealth() const;
 
 protected:
 	virtual void BeginPlay() override;
