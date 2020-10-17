@@ -41,10 +41,13 @@ private:
 	float RotationRate = 0.75f;
 	UPROPERTY(VisibleAnywhere, Category = "Movement")
 	float RotationAmount = 0.f;
+	UPROPERTY(EditAnywhere, Category="Effects")
+	USoundBase* BurningSound;
 
 	ABP_GameMode* GameModeRef;
 	UCharacterMovementComponent* MovementComponent;
 	UCapsuleComponent* CapsuleComponent;
+	UAudioComponent* BurningSoundComponent;
 	bool IsAlive = true;
 
 	void Move(float AxisValue);
@@ -52,5 +55,6 @@ private:
 	void WallJump();
 	void ToggleMissionList();
 	void RestartLevel();
+	bool IsBurnSoundValid() const;
 
 };

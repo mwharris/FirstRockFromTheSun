@@ -82,6 +82,9 @@ bool ABP_GameMode::AllMissionsComplete() const
 void ABP_GameMode::StartDowntime() 
 {
     SolarFlareActive = false;
+    if (FlareSoundComponent) {
+        FlareSoundComponent->Stop();
+    }
     GetWorldTimerManager().SetTimer(FlareTimerHandle, this, &ABP_GameMode::StartCountdown, SolarFlareDowntime);
 }
 
@@ -98,7 +101,10 @@ void ABP_GameMode::StartSolarFlare()
 {
     CountdownActive = false;
     SolarFlareActive = true;
-    AlarmSoundComponent->Stop();
+    if (AlarmSoundComponent) {
+        AlarmSoundComponent->Stop();
+    }
+    FlareSoundComponent = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), FlareSound, Player->GetActorLocation(), FRotator::ZeroRotator);
     GetWorldTimerManager().SetTimer(FlareTimerHandle, this, &ABP_GameMode::StartDowntime, SolarFlareDuration);
 }
 

@@ -43,12 +43,15 @@ private:
 	float SolarFlareDuration = 10.f;
 	UPROPERTY(EditAnywhere, Category="Effects")
 	USoundBase* AlarmSound;
+	UPROPERTY(EditAnywhere, Category="Effects")
+	USoundBase* FlareSound;
 	
 	// References and variable cache
 	AMainCharacter* Player;
 	TArray<AMissionPoint*> MissionPoints;
 	FTimerHandle FlareTimerHandle;
 	UAudioComponent* AlarmSoundComponent;
+	UAudioComponent* FlareSoundComponent;
 	bool GameStarted = false;
 
 	// Variables for various game states

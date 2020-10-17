@@ -1,15 +1,14 @@
 -------------------
 GAME JAM TO-DO
 -------------------
-- Fix up the Main Menu
-	- Test going back and forth between menu and game
-- Story Screen
 - Level Design
 	- Tubes that you can wall-jump back and forth on
 	- Vertical platforms that you need to precisely jump on
 	- Vertical platform that you need to jump over and then wall-jump on the other side
 - Audio
-	- Woosh / burning sound
+	- Ding when you complete a mission
+	- Burning when you are taking damage
+	- Woosh / burning sound during a solar flare
 	- Walking / Jumping
 	- Music?...
 - Fixes
