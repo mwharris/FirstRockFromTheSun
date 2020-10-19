@@ -150,7 +150,7 @@ void AMainCharacter::RestartLevel()
 
 bool AMainCharacter::IsBurnSoundValid() const
 {
-	return BurningSoundComponent != nullptr && IsValid(BurningSoundComponent) && BurningSoundComponent;
+	return BurningSoundComponent != nullptr && IsValid(BurningSoundComponent) && BurningSoundComponent->IsValidLowLevel() && BurningSoundComponent ;
 }
 
 void AMainCharacter::HandleGameOver(bool PlayerDied) 
