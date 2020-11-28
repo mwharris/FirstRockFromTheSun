@@ -81,6 +81,7 @@ bool ABP_GameMode::AllMissionsComplete() const
 // Solar Flare -> Downtime
 void ABP_GameMode::StartDowntime() 
 {
+    CountdownActive = false;
     SolarFlareActive = false;
     if (FlareSoundComponent) {
         FlareSoundComponent->Stop();
@@ -92,6 +93,7 @@ void ABP_GameMode::StartDowntime()
 void ABP_GameMode::StartCountdown() 
 {
     CountdownActive = true;
+    SolarFlareActive = false;
     AlarmSoundComponent = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), AlarmSound, Player->GetActorLocation(), FRotator::ZeroRotator);
     GetWorldTimerManager().SetTimer(FlareTimerHandle, this, &ABP_GameMode::StartSolarFlare, SolarFlareCountdown);
 }
@@ -101,7 +103,8 @@ void ABP_GameMode::StartSolarFlare()
 {
     CountdownActive = false;
     SolarFlareActive = true;
-    if (AlarmSoundComponent) {
+    if (AlarmSoundComponent) 
+    {
         AlarmSoundComponent->Stop();
     }
     FlareSoundComponent = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), FlareSound, Player->GetActorLocation(), FRotator::ZeroRotator);
@@ -112,8 +115,12 @@ void ABP_GameMode::StartSolarFlare()
 void ABP_GameMode::HandleGameOver(bool PlayerDied) 
 {
     // Move to downtime but clear our timer
-    StartDowntime();
-    GetWorldTimerManager().ClearTimer(FlareTimerHandle);
+    if (GetWorld() && FlareTimerHandle.IsValid())
+    {
+        GetWorldTimerManager().ClearTimer(FlareTimerHandle);
+    }
+    SolarFlareActive = false;
+    CountdownActive = false;
     // Tell the player to handle player-specific operations
     Player->HandleGameOver(PlayerDied);
     // Mark the game as being over

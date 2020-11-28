@@ -45,16 +45,18 @@ void AMissionPoint::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* 
 		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) 
 {
 	// Don't finish the final mission until all other missions are completed
-	if (!FinalMission || GameModeRef->ShouldFinalMissionComplete()) 
+	if (!MissionComplete && (!FinalMission || GameModeRef->ShouldFinalMissionComplete())) 
 	{
-		if (!MissionComplete) 
+		if (OtherActor == nullptr || Player == nullptr)
 		{
-			// If it was the player that overlapped, mark the mission as complete
-			if (OtherActor && Player && OtherActor == Player) 
-			{
-				MissionComplete = true;
-				SuccessTextRender->SetVisibility(true);
-			}
+			return;
+		}
+		// If it was the player that overlapped, mark the mission as complete
+		else if (OtherActor == Player) 
+		{
+			MissionComplete = true;
+			if (SuccessTextRender) { SuccessTextRender->SetVisibility(true); }
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), PickupSound, GetActorLocation());
 		}
 	}
 }

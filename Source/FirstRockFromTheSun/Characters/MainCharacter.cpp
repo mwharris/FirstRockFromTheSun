@@ -57,6 +57,7 @@ void AMainCharacter::Tick(float DeltaTime)
 		FRotator RotFromX = UKismetMathLibrary::MakeRotFromX(FlatVelocity);
 		FVector RightVec = UKismetMathLibrary::GetRightVector(RotFromX);
 		FRotator WorldRot = UKismetMathLibrary::RotatorFromAxisAndAngle(RightVec, RotationAmount);
+		FString Str = WorldRot.Vector().ToString();
 		// Rotate the RotatePoint (midpoint)
 		RotatePoint->SetWorldRotation(WorldRot);
 	}
@@ -81,7 +82,7 @@ void AMainCharacter::ToggleMissionList()
 void AMainCharacter::CustomJump() 
 {
 	if (!IsAlive) { return; }
-	if (!MovementComponent->IsFalling()) 
+	if (MovementComponent != nullptr && !MovementComponent->IsFalling()) 
 	{
 		Jump();
 	}
@@ -89,6 +90,7 @@ void AMainCharacter::CustomJump()
 	{
 		WallJump();
 	}
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(), JumpSound, GetActorLocation());
 }
 
 // Check if we collided with a wall and can wall jump
@@ -131,7 +133,7 @@ void AMainCharacter::DoSolarFlareRaycast(float DeltaTime)
 		// Apply damage and play a sound to indicate we're being hurt
 		UGameplayStatics::ApplyDamage(Hit.GetActor(), FlareDamage * DeltaTime, GetInstigatorController(), this, DamageType);
 		if (!IsBurnSoundValid()) {
-			BurningSoundComponent = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), BurningSound, GetActorLocation());
+			BurningSoundComponent = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), BurningSound, GetActorLocation(), FRotator::ZeroRotator, 0.5f);
 		}
 		else if (IsBurnSoundValid() && !BurningSoundComponent->IsPlaying()) {
 			BurningSoundComponent->Play();
@@ -144,7 +146,7 @@ void AMainCharacter::DoSolarFlareRaycast(float DeltaTime)
 
 void AMainCharacter::RestartLevel() 
 {
-	if (IsAlive) { return; }
+	if (!GameOver) { return; }
 	UGameplayStatics::OpenLevel(GetWorld(), "GameMap", true);
 }
 
@@ -156,6 +158,7 @@ bool AMainCharacter::IsBurnSoundValid() const
 void AMainCharacter::HandleGameOver(bool PlayerDied) 
 {
 	IsAlive = !PlayerDied;
+	GameOver = true;
 }
 
 bool AMainCharacter::GetIsAlive() const

@@ -29,25 +29,29 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category="Components")
 	UBoxComponent* BoxCollider = nullptr;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category="Components")
 	UTextRenderComponent* TitleTextRender;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category="Components")
 	UTextRenderComponent* SuccessTextRender;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Properties", meta=(AllowPrivateAccess = "true"))
 	int32 MissionNumber = 0;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category="Properties")
 	bool FinalMission = false;
-	UPROPERTY(EditAnywhere)
-	FString Objective = "Do something";
-	UPROPERTY(EditAnywhere)
-	FString ItemName = "tacos";
-	UPROPERTY(EditAnywhere)
-	FString CharacterName = "Malibel";
-	
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category="Properties")
 	bool MissionComplete = false;
+	
+	UPROPERTY(EditAnywhere, Category="Text")
+	FString Objective = "Do something";
+	UPROPERTY(EditAnywhere, Category="Text")
+	FString ItemName = "tacos";
+	UPROPERTY(EditAnywhere, Category="Text")
+	FString CharacterName = "Malibel";
+
+	UPROPERTY(EditAnywhere, Category="Sounds")
+	USoundBase* PickupSound;
 	
 	ABP_GameMode* GameModeRef;
 	AMainCharacter* Player;
