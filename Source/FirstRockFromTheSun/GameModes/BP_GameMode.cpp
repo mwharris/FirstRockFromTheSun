@@ -114,6 +114,8 @@ void ABP_GameMode::HandleGameOver(bool PlayerDied)
     // Move to downtime but clear our timer
     StartDowntime();
     GetWorldTimerManager().ClearTimer(FlareTimerHandle);
+    CountdownActive = false;
+    SolarFlareActive = false;
     // Tell the player to handle player-specific operations
     Player->HandleGameOver(PlayerDied);
     // Mark the game as being over

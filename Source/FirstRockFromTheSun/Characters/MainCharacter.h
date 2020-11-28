@@ -43,12 +43,15 @@ private:
 	float RotationAmount = 0.f;
 	UPROPERTY(EditAnywhere, Category="Effects")
 	USoundBase* BurningSound;
+	UPROPERTY(EditAnywhere, Category="Effects")
+	USoundBase* JumpSound;
 
 	ABP_GameMode* GameModeRef;
 	UCharacterMovementComponent* MovementComponent;
 	UCapsuleComponent* CapsuleComponent;
 	UAudioComponent* BurningSoundComponent;
 	bool IsAlive = true;
+	bool GameOver = false;
 
 	void Move(float AxisValue);
 	void CustomJump();
