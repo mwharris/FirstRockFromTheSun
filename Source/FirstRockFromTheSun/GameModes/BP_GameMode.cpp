@@ -43,6 +43,8 @@ void ABP_GameMode::StartDowntime()
     {
         GetWorldTimerManager().ClearTimer(PlayerRaycastTimerHandle);
     }
+    // Notify the player we're done raycasting
+    Player->StopSolarFlareAudio();
     CountdownActive = false;
     SolarFlareActive = false;
     if (FlareSoundComponent) {
