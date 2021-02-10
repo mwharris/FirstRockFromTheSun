@@ -62,8 +62,9 @@ void AMainCharacter::Tick(float DeltaTime)
 		RotatePoint->SetWorldRotation(WorldRot);
 	}
 	// Pause hurt sound if solar flare isn't active
-	if (!GameModeRef->IsSolarFlareActive() && IsBurnSoundValid() && BurningSoundComponent->IsPlaying()) {
-		BurningSoundComponent->Stop();
+	if (!GameModeRef->IsSolarFlareActive() && BurningSoundComponent != nullptr) {
+		BurningSoundComponent->DestroyComponent();
+		BurningSoundComponent = nullptr;
 	}
 }
 
@@ -132,15 +133,13 @@ void AMainCharacter::DoSolarFlareRaycast(float DeltaTime)
 	{
 		// Apply damage and play a sound to indicate we're being hurt
 		UGameplayStatics::ApplyDamage(Hit.GetActor(), FlareDamage * DeltaTime, GetInstigatorController(), this, DamageType);
-		if (!IsBurnSoundValid()) {
-			BurningSoundComponent = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), BurningSound, GetActorLocation(), FRotator::ZeroRotator, 0.5f);
-		}
-		else if (IsBurnSoundValid() && !BurningSoundComponent->IsPlaying()) {
-			BurningSoundComponent->Play();
+		if (BurningSoundComponent == nullptr) {
+			BurningSoundComponent = UGameplayStatics::SpawnSound2D(GetWorld(), BurningSound);
 		}
 	}
-	else if (IsBurnSoundValid() && BurningSoundComponent->IsPlaying()) {
-		BurningSoundComponent->Stop();
+	else if (BurningSoundComponent != nullptr && BurningSoundComponent->IsPlaying()) {
+		BurningSoundComponent->DestroyComponent();
+		BurningSoundComponent = nullptr;
 	}
 }
 
@@ -148,11 +147,6 @@ void AMainCharacter::RestartLevel()
 {
 	if (!GameOver) { return; }
 	UGameplayStatics::OpenLevel(GetWorld(), "GameMap", true);
-}
-
-bool AMainCharacter::IsBurnSoundValid() const
-{
-	return BurningSoundComponent->IsValidLowLevel() && IsValid(BurningSoundComponent) && BurningSoundComponent != nullptr && BurningSoundComponent ;
 }
 
 void AMainCharacter::HandleGameOver(bool PlayerDied) 

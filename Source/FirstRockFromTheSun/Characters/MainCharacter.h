@@ -58,6 +58,5 @@ private:
 	void WallJump();
 	void ToggleMissionList();
 	void RestartLevel();
-	bool IsBurnSoundValid() const;
 
 };
