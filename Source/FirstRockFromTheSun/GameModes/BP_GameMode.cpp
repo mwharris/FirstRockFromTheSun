@@ -86,6 +86,7 @@ void ABP_GameMode::StartDowntime()
     if (FlareSoundComponent) {
         FlareSoundComponent->Stop();
     }
+    OnSolarFlareEnd();
     GetWorldTimerManager().SetTimer(FlareTimerHandle, this, &ABP_GameMode::StartCountdown, SolarFlareDowntime);
 }
 
@@ -110,6 +111,7 @@ void ABP_GameMode::StartSolarFlare()
         AlarmSoundComponent->DestroyComponent();
         AlarmSoundComponent = nullptr;
     }
+    OnSolarFlareStart();
     FlareSoundComponent = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), FlareSound, Player->GetActorLocation(), FRotator::ZeroRotator);
     GetWorldTimerManager().SetTimer(FlareTimerHandle, this, &ABP_GameMode::StartDowntime, SolarFlareDuration);
 }

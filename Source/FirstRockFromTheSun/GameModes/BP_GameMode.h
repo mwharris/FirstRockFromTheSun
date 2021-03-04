@@ -32,6 +32,11 @@ public:
 	bool IsMissionListOpen() const;
 	
 protected:
+	UFUNCTION(BlueprintImplementableEvent, Category="Game State")
+	void OnSolarFlareStart();
+	UFUNCTION(BlueprintImplementableEvent, Category="Game State")
+	void OnSolarFlareEnd();
+
 	virtual void BeginPlay() override;
 
 private:
