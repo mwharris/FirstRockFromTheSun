@@ -59,7 +59,6 @@ void ABP_GameMode::StartCountdown()
     if (AlarmSoundComponent == nullptr) {
         AlarmSoundComponent = UGameplayStatics::SpawnSound2D(GetWorld(), AlarmSound);
     }
-    Player->NotifyHUDSolarFlare(); // Tell the Player HUD to show the solar flare warning
     GetWorldTimerManager().SetTimer(FlareTimerHandle, this, &ABP_GameMode::StartSolarFlare, SolarFlareCountdown);
 }
 
@@ -74,7 +73,6 @@ void ABP_GameMode::StartSolarFlare()
         AlarmSoundComponent = nullptr;
     }
     OnSolarFlareStart();
-    Player->NotifyHUDSolarFlare(); // Tell the Player HUD to stop showing the solar flare warning
     FlareSoundComponent = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), FlareSound, Player->GetActorLocation(), FRotator::ZeroRotator);
     GetWorldTimerManager().SetTimer(FlareTimerHandle, this, &ABP_GameMode::StartDowntime, SolarFlareDuration);
     GetWorldTimerManager().SetTimer(PlayerRaycastTimerHandle, this, &ABP_GameMode::DoSolarFlare, SolarFlareTickFrequency, true);

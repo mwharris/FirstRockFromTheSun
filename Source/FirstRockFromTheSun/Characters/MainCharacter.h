@@ -13,7 +13,7 @@ class FIRSTROCKFROMTHESUN_API AMainCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
-    UFUNCTION(BlueprintImplementableEvent)
+    UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
     void NotifyHUDSolarFlare();
 
 	AMainCharacter();
