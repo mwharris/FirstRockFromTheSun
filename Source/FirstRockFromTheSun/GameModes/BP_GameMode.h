@@ -16,8 +16,8 @@ class FIRSTROCKFROMTHESUN_API ABP_GameMode : public AGameModeBase
 public:
 	ABP_GameMode();
 	void HandleGameOver(bool PlayerDied);
-	void ToggleMissionList();
 	bool ShouldFinalMissionComplete() const;
+	void MissionCompleted();
 
 	UFUNCTION(BlueprintCallable, Category="Solar Flare")
 	bool IsSolarFlareActive() const;
@@ -27,8 +27,6 @@ public:
 	bool IsGameOver() const;
 	UFUNCTION(BlueprintCallable, Category="Game State")
 	bool DidPlayerWin() const;
-	UFUNCTION(BlueprintCallable, Category="Game State")
-	bool IsMissionListOpen() const;
 	
 protected:
 	UFUNCTION(BlueprintImplementableEvent, Category="Game State")
@@ -66,11 +64,9 @@ private:
 	bool SolarFlareActive = false;
 	bool GameOver = false;
 	bool PlayerWon = false;
-	bool MissionListOpen = false;
 
 	void LoadMissionPoints();
 	void CheckWinCondition();
-	bool AllMissionsComplete() const;
 	void StartDowntime();
 	void StartCountdown();
 	void StartSolarFlare();
