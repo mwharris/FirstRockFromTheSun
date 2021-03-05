@@ -7,7 +7,7 @@
 
 ABP_GameMode::ABP_GameMode() 
 {
-    PrimaryActorTick.bCanEverTick = true;
+    PrimaryActorTick.bCanEverTick = false;
 }
 
 void ABP_GameMode::BeginPlay()
@@ -17,29 +17,7 @@ void ABP_GameMode::BeginPlay()
     Player = Cast<AMainCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
     // Get references to all Mission Points in the level
     LoadMissionPoints();
-}
-
-void ABP_GameMode::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-    // Get the name of the current level so we don't run logic on the Main Menu
-    FString CurrLevelName = UGameplayStatics::GetCurrentLevelName(GetWorld());
-    // Don't bother checking this stuff until we're playing the game
-    if (GameStarted) 
-    {
-        CheckWinCondition();
-        // If our solar flare is active, tell the player to raycast
-        if (SolarFlareActive) 
-        {
-            Player->DoSolarFlareRaycast(DeltaTime);
-        }
-    }
-    // Start our timers only when we start the play level
-    else if (CurrLevelName == TEXT("GameMap"))
-    {
-        GameStarted = true;
-        StartDowntime();
-    }
+    StartDowntime();
 }
 
 // Get a list of spawned MissionPoints and convert to AMissionPoints
@@ -81,6 +59,11 @@ bool ABP_GameMode::AllMissionsComplete() const
 // Solar Flare -> Downtime
 void ABP_GameMode::StartDowntime() 
 {
+    // Kill our damage raycast timer
+    if (GetWorld() && PlayerRaycastTimerHandle.IsValid())
+    {
+        GetWorldTimerManager().ClearTimer(PlayerRaycastTimerHandle);
+    }
     CountdownActive = false;
     SolarFlareActive = false;
     if (FlareSoundComponent) {
@@ -114,6 +97,12 @@ void ABP_GameMode::StartSolarFlare()
     OnSolarFlareStart();
     FlareSoundComponent = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), FlareSound, Player->GetActorLocation(), FRotator::ZeroRotator);
     GetWorldTimerManager().SetTimer(FlareTimerHandle, this, &ABP_GameMode::StartDowntime, SolarFlareDuration);
+    GetWorldTimerManager().SetTimer(PlayerRaycastTimerHandle, this, &ABP_GameMode::DoSolarFlare, SolarFlareTickFrequency, true);
+}
+
+void ABP_GameMode::DoSolarFlare() 
+{
+    Player->DoSolarFlareRaycast(SolarFlareTickFrequency);
 }
 
 // Handle move to Win or Loss state
