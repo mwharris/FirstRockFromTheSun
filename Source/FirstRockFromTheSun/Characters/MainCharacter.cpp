@@ -21,8 +21,6 @@ AMainCharacter::AMainCharacter()
 	FlareRaycastPoint = CreateDefaultSubobject<USceneComponent>(TEXT("Flare Raycast Point"));
 	FlareRaycastPoint->SetupAttachment(RootComponent);
 
-	AudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Burn Audio"));
-	AudioComponent->SetupAttachment(RootComponent);
 }
 
 void AMainCharacter::BeginPlay()
@@ -63,6 +61,12 @@ void AMainCharacter::Tick(float DeltaTime)
 		// Rotate the RotatePoint (midpoint)
 		RotatePoint->SetWorldRotation(WorldRot);
 	}
+	/*
+	// Pause hurt sound if solar flare isn't active
+	if (!GameModeRef->IsSolarFlareActive() && IsBurnSoundValid() && BurningSoundComponent->IsPlaying()) {
+		BurningSoundComponent->Stop();
+	}
+	*/
 }
 
 void AMainCharacter::Move(float AxisValue) 
@@ -130,25 +134,31 @@ void AMainCharacter::DoSolarFlareRaycast(float DeltaTime)
 	{
 		// Apply damage and play a sound to indicate we're being hurt
 		UGameplayStatics::ApplyDamage(Hit.GetActor(), FlareDamage * DeltaTime, GetInstigatorController(), this, DamageType);
-		if (!AudioComponent->IsPlaying()) {
-			AudioComponent->Play();
+		/*
+		if (!IsBurnSoundValid()) {
+			BurningSoundComponent = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), BurningSound, GetActorLocation(), FRotator::ZeroRotator, 0.5f);
 		}
+		else if (IsBurnSoundValid() && !BurningSoundComponent->IsPlaying()) {
+			BurningSoundComponent->Play();
+		}
+		*/
 	}
-	else if (AudioComponent->IsPlaying()) {
-		AudioComponent->Stop();
+	/*
+	else if (IsBurnSoundValid() && BurningSoundComponent->IsPlaying()) {
+		BurningSoundComponent->Stop();
 	}
-}
-
-// Called by GameMode to make sure we're not still playing audio
-void AMainCharacter::StopSolarFlareAudio() const
-{
-	AudioComponent->Stop();
+	*/
 }
 
 void AMainCharacter::RestartLevel() 
 {
 	if (!GameOver) { return; }
 	UGameplayStatics::OpenLevel(GetWorld(), "GameMap", true);
+}
+
+bool AMainCharacter::IsBurnSoundValid() const
+{
+	return BurningSoundComponent->IsValidLowLevel() && IsValid(BurningSoundComponent) && BurningSoundComponent != nullptr && BurningSoundComponent ;
 }
 
 void AMainCharacter::HandleGameOver(bool PlayerDied) 

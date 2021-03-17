@@ -21,7 +21,6 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void DoSolarFlareRaycast(float DeltaTime);
-	void StopSolarFlareAudio() const;
 	void HandleGameOver(bool PlayerDied);
 	bool GetIsAlive() const;
 
@@ -42,8 +41,6 @@ private:
 	USceneComponent* FlareRaycastPoint;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UHealthComponent* HealthComponent;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	UAudioComponent* AudioComponent;
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	TSubclassOf<UDamageType> DamageType;
 	UPROPERTY(EditAnywhere, Category = "Damage")
@@ -53,11 +50,14 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Movement")
 	float RotationAmount = 0.f;
 	UPROPERTY(EditAnywhere, Category="Effects")
+	USoundBase* BurningSound;
+	UPROPERTY(EditAnywhere, Category="Effects")
 	USoundBase* JumpSound;
 
 	ABP_GameMode* GameModeRef;
 	UCharacterMovementComponent* MovementComponent;
 	UCapsuleComponent* CapsuleComponent;
+	UAudioComponent* BurningSoundComponent;
 	bool IsAlive = true;
 	bool GameOver = false;
 
@@ -66,5 +66,6 @@ private:
 	void WallJump();
 	void ToggleMissionList();
 	void RestartLevel();
+	bool IsBurnSoundValid() const;
 
 };
