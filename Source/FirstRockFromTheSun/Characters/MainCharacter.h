@@ -13,9 +13,6 @@ class FIRSTROCKFROMTHESUN_API AMainCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintImplementableEvent)
-	void NotifyHUDSolarFlare();
-
 	AMainCharacter();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -25,11 +22,6 @@ public:
 	bool GetIsAlive() const;
 
 protected:
-	UFUNCTION(BlueprintImplementableEvent, meta=(AllowPrivateAccess = "true"))
-	void NotifyHUDGameOver();
-	UFUNCTION(BlueprintImplementableEvent, meta=(AllowPrivateAccess = "true"))
-	void NotifyHUDMissionList();
-
 	virtual void BeginPlay() override;
 
 private:

@@ -17,8 +17,8 @@ public:
 	ABP_GameMode();
 	virtual void Tick(float DeltaTime) override;
 	void HandleGameOver(bool PlayerDied);
+	void ToggleMissionList();
 	bool ShouldFinalMissionComplete() const;
-	void MissionCompleted();
 
 	UFUNCTION(BlueprintCallable, Category="Solar Flare")
 	bool IsSolarFlareActive() const;
@@ -28,6 +28,8 @@ public:
 	bool IsGameOver() const;
 	UFUNCTION(BlueprintCallable, Category="Game State")
 	bool DidPlayerWin() const;
+	UFUNCTION(BlueprintCallable, Category="Game State")
+	bool IsMissionListOpen() const;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -57,9 +59,11 @@ private:
 	bool SolarFlareActive = false;
 	bool GameOver = false;
 	bool PlayerWon = false;
+	bool MissionListOpen = false;
 
 	void LoadMissionPoints();
 	void CheckWinCondition();
+	bool AllMissionsComplete() const;
 	void StartDowntime();
 	void StartCountdown();
 	void StartSolarFlare();

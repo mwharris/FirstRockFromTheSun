@@ -76,7 +76,7 @@ void AMainCharacter::Move(float AxisValue)
 void AMainCharacter::ToggleMissionList() 
 {
 	if (!IsAlive) { return; }
-	NotifyHUDMissionList();
+	GameModeRef->ToggleMissionList();
 }
 
 void AMainCharacter::CustomJump() 
@@ -159,7 +159,6 @@ void AMainCharacter::HandleGameOver(bool PlayerDied)
 {
 	IsAlive = !PlayerDied;
 	GameOver = true;
-	NotifyHUDGameOver();
 }
 
 bool AMainCharacter::GetIsAlive() const
