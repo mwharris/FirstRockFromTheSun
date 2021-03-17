@@ -7,7 +7,7 @@
 
 ABP_GameMode::ABP_GameMode() 
 {
-    PrimaryActorTick.bCanEverTick = true;
+    PrimaryActorTick.bCanEverTick = false;
 }
 
 void ABP_GameMode::BeginPlay()
@@ -17,29 +17,7 @@ void ABP_GameMode::BeginPlay()
     Player = Cast<AMainCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
     // Get references to all Mission Points in the level
     LoadMissionPoints();
-}
-
-void ABP_GameMode::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-    // Get the name of the current level so we don't run logic on the Main Menu
-    FString CurrLevelName = UGameplayStatics::GetCurrentLevelName(GetWorld());
-    // Don't bother checking this stuff until we're playing the game
-    if (GameStarted) 
-    {
-        CheckWinCondition();
-        // If our solar flare is active, tell the player to raycast
-        if (SolarFlareActive) 
-        {
-            Player->DoSolarFlareRaycast(DeltaTime);
-        }
-    }
-    // Start our timers only when we start the play level
-    else if (CurrLevelName == TEXT("GameMap"))
-    {
-        GameStarted = true;
-        StartDowntime();
-    }
+    StartDowntime();
 }
 
 // Get a list of spawned MissionPoints and convert to AMissionPoints
@@ -56,36 +34,20 @@ void ABP_GameMode::LoadMissionPoints()
     }
 }
 
-void ABP_GameMode::CheckWinCondition() 
-{
-    if (MissionPoints.Num() == 0) { return; }
-    if (AllMissionsComplete()) 
-    {
-        HandleGameOver(false);
-    }
-}
-
-// Helper function to determine if all of our missions are complete
-bool ABP_GameMode::AllMissionsComplete() const
-{
-    for (AMissionPoint* MissionPoint : MissionPoints) 
-    {
-        if (!MissionPoint->GetMissionComplete()) 
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
 // Solar Flare -> Downtime
 void ABP_GameMode::StartDowntime() 
 {
+    // Kill our damage raycast timer
+    if (GetWorld() && PlayerRaycastTimerHandle.IsValid())
+    {
+        GetWorldTimerManager().ClearTimer(PlayerRaycastTimerHandle);
+    }
     CountdownActive = false;
     SolarFlareActive = false;
     if (FlareSoundComponent) {
         FlareSoundComponent->Stop();
     }
+    OnSolarFlareEnd();
     GetWorldTimerManager().SetTimer(FlareTimerHandle, this, &ABP_GameMode::StartCountdown, SolarFlareDowntime);
 }
 
@@ -94,7 +56,10 @@ void ABP_GameMode::StartCountdown()
 {
     CountdownActive = true;
     SolarFlareActive = false;
-    AlarmSoundComponent = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), AlarmSound, Player->GetActorLocation(), FRotator::ZeroRotator);
+    if (AlarmSoundComponent == nullptr) {
+        AlarmSoundComponent = UGameplayStatics::SpawnSound2D(GetWorld(), AlarmSound);
+    }
+    Player->NotifyHUDSolarFlare();
     GetWorldTimerManager().SetTimer(FlareTimerHandle, this, &ABP_GameMode::StartSolarFlare, SolarFlareCountdown);
 }
 
@@ -103,12 +68,45 @@ void ABP_GameMode::StartSolarFlare()
 {
     CountdownActive = false;
     SolarFlareActive = true;
-    if (AlarmSoundComponent) 
+    if (AlarmSoundComponent != nullptr) 
     {
-        AlarmSoundComponent->Stop();
+        AlarmSoundComponent->DestroyComponent();
+        AlarmSoundComponent = nullptr;
     }
+    Player->NotifyHUDSolarFlare();
+    OnSolarFlareStart();
     FlareSoundComponent = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), FlareSound, Player->GetActorLocation(), FRotator::ZeroRotator);
     GetWorldTimerManager().SetTimer(FlareTimerHandle, this, &ABP_GameMode::StartDowntime, SolarFlareDuration);
+    GetWorldTimerManager().SetTimer(PlayerRaycastTimerHandle, this, &ABP_GameMode::DoSolarFlare, SolarFlareTickFrequency, true);
+}
+
+void ABP_GameMode::DoSolarFlare() 
+{
+    Player->DoSolarFlareRaycast(SolarFlareTickFrequency);
+}
+
+void ABP_GameMode::MissionCompleted() 
+{
+    CheckWinCondition();
+}
+
+void ABP_GameMode::CheckWinCondition() 
+{
+    if (MissionPoints.Num() == 0) { return; }
+    // Determine if all missions are completed
+    bool AllMissionsComplete = true;
+    for (AMissionPoint* MissionPoint : MissionPoints) 
+    {
+        if (!MissionPoint->GetMissionComplete()) 
+        {
+            AllMissionsComplete = false;
+        }
+    }
+    // Call GameOver if all missions are completed
+    if (AllMissionsComplete) 
+    {
+        HandleGameOver(false);
+    }
 }
 
 // Handle move to Win or Loss state
@@ -121,19 +119,11 @@ void ABP_GameMode::HandleGameOver(bool PlayerDied)
     }
     SolarFlareActive = false;
     CountdownActive = false;
+    // Set Game Over flags
+    GameOver = true;
+    PlayerWon = !PlayerDied;
     // Tell the player to handle player-specific operations
     Player->HandleGameOver(PlayerDied);
-    // Mark the game as being over
-    GameOver = true;
-    // Set the player won flag accordingly
-    if (PlayerDied) 
-    {
-        PlayerWon = false;
-    }
-    else 
-    {
-        PlayerWon = true;
-    }
 }
 
 // The Final Mission should only complete when all other missions are completed
@@ -150,14 +140,8 @@ bool ABP_GameMode::ShouldFinalMissionComplete() const
     return true;
 }
 
-void ABP_GameMode::ToggleMissionList() 
-{
-    MissionListOpen = !MissionListOpen;
-}
-
 // GETTER FUNCTIONS
 bool ABP_GameMode::IsSolarFlareActive() const { return SolarFlareActive; }
 bool ABP_GameMode::IsCountdownActive()  const { return CountdownActive; }
 bool ABP_GameMode::IsGameOver()         const { return GameOver; }
 bool ABP_GameMode::DidPlayerWin()       const { return PlayerWon; }
-bool ABP_GameMode::IsMissionListOpen()  const { return MissionListOpen; }

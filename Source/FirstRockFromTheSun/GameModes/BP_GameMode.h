@@ -15,10 +15,9 @@ class FIRSTROCKFROMTHESUN_API ABP_GameMode : public AGameModeBase
 
 public:
 	ABP_GameMode();
-	virtual void Tick(float DeltaTime) override;
 	void HandleGameOver(bool PlayerDied);
-	void ToggleMissionList();
 	bool ShouldFinalMissionComplete() const;
+	void MissionCompleted();
 
 	UFUNCTION(BlueprintCallable, Category="Solar Flare")
 	bool IsSolarFlareActive() const;
@@ -28,10 +27,13 @@ public:
 	bool IsGameOver() const;
 	UFUNCTION(BlueprintCallable, Category="Game State")
 	bool DidPlayerWin() const;
-	UFUNCTION(BlueprintCallable, Category="Game State")
-	bool IsMissionListOpen() const;
 	
 protected:
+	UFUNCTION(BlueprintImplementableEvent, Category="Game State")
+	void OnSolarFlareStart();
+	UFUNCTION(BlueprintImplementableEvent, Category="Game State")
+	void OnSolarFlareEnd();
+
 	virtual void BeginPlay() override;
 
 private:
@@ -41,6 +43,8 @@ private:
 	float SolarFlareCountdown = 5.f;
 	UPROPERTY(EditDefaultsOnly)
 	float SolarFlareDuration = 10.f;
+	UPROPERTY(EditDefaultsOnly)
+	float SolarFlareTickFrequency = 0.033;
 	UPROPERTY(EditAnywhere, Category="Effects")
 	USoundBase* AlarmSound;
 	UPROPERTY(EditAnywhere, Category="Effects")
@@ -50,6 +54,7 @@ private:
 	AMainCharacter* Player;
 	TArray<AMissionPoint*> MissionPoints;
 	FTimerHandle FlareTimerHandle;
+	FTimerHandle PlayerRaycastTimerHandle;
 	UAudioComponent* AlarmSoundComponent;
 	UAudioComponent* FlareSoundComponent;
 	bool GameStarted = false;
@@ -59,14 +64,13 @@ private:
 	bool SolarFlareActive = false;
 	bool GameOver = false;
 	bool PlayerWon = false;
-	bool MissionListOpen = false;
 
 	void LoadMissionPoints();
 	void CheckWinCondition();
-	bool AllMissionsComplete() const;
 	void StartDowntime();
 	void StartCountdown();
 	void StartSolarFlare();
 	void EndSolarFlare();
+	void DoSolarFlare();
 
 };

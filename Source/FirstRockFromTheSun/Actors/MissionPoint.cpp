@@ -57,6 +57,7 @@ void AMissionPoint::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* 
 			MissionComplete = true;
 			if (SuccessTextRender) { SuccessTextRender->SetVisibility(true); }
 			UGameplayStatics::PlaySoundAtLocation(GetWorld(), PickupSound, GetActorLocation());
+			GameModeRef->MissionCompleted();
 		}
 	}
 }

@@ -62,8 +62,9 @@ void AMainCharacter::Tick(float DeltaTime)
 		RotatePoint->SetWorldRotation(WorldRot);
 	}
 	// Pause hurt sound if solar flare isn't active
-	if (!GameModeRef->IsSolarFlareActive() && IsBurnSoundValid() && BurningSoundComponent->IsPlaying()) {
-		BurningSoundComponent->Stop();
+	if (!GameModeRef->IsSolarFlareActive() && BurningSoundComponent != nullptr) {
+		BurningSoundComponent->DestroyComponent();
+		BurningSoundComponent = nullptr;
 	}
 }
 
@@ -76,7 +77,7 @@ void AMainCharacter::Move(float AxisValue)
 void AMainCharacter::ToggleMissionList() 
 {
 	if (!IsAlive) { return; }
-	GameModeRef->ToggleMissionList();
+	NotifyHUDMissionList();
 }
 
 void AMainCharacter::CustomJump() 
@@ -96,23 +97,27 @@ void AMainCharacter::CustomJump()
 // Check if we collided with a wall and can wall jump
 void AMainCharacter::WallJump() 
 {
-	FHitResult Hit;
+	FHitResult HitLeft;
+	FHitResult HitRight;
 	// Calculate a length for a wall jump raycast
 	FVector Forward = GetActorForwardVector();
 	// Make sure it's slightly bigger than our radius
 	FVector Length = Forward * (CapsuleComponent->GetScaledCapsuleRadius() + 10.f);
 	// Raycast from (Location - Length) to (Location + Length)
-	FVector Start = RotatePoint->GetComponentLocation() - Length;
-	FVector End = RotatePoint->GetComponentLocation() + Length;
+	FVector Left = RotatePoint->GetComponentLocation() - Length;
+	FVector Right = RotatePoint->GetComponentLocation() + Length;
 	// Make sure we don't hit ourselves
 	FCollisionQueryParams CollisionParams;
 	CollisionParams.AddIgnoredActor(this);
 	// Perform the raycast and check the results
-	bool bSuccess = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_GameTraceChannel1, CollisionParams);
-	if (bSuccess) 
+	bool bSuccessRight = GetWorld()->LineTraceSingleByChannel(HitRight, RotatePoint->GetComponentLocation(), Right, ECC_Visibility, CollisionParams);
+	bool bSuccessLeft = GetWorld()->LineTraceSingleByChannel(HitLeft, RotatePoint->GetComponentLocation(), Left, ECC_Visibility, CollisionParams);
+	if (bSuccessRight || bSuccessLeft) 
 	{
+		// Determine the impact x point by which side we hit on
+		float ImpactX = bSuccessRight ? HitRight.ImpactPoint.X : HitLeft.ImpactPoint.X;
 		// Subtract player location from impact point in order to determine what side we hit the wall
-		float LaunchVelocityX = FMath::Sign(RotatePoint->GetComponentLocation().X - Hit.ImpactPoint.X) * 800.f;
+		float LaunchVelocityX = FMath::Sign(RotatePoint->GetComponentLocation().X - ImpactX) * 800.f;
 		float LaunchVelocityZ = 1400;
 		// Launch our character in the appropriate direction
 		LaunchCharacter(FVector(LaunchVelocityX, 0.f, LaunchVelocityZ), true, true);
@@ -132,15 +137,13 @@ void AMainCharacter::DoSolarFlareRaycast(float DeltaTime)
 	{
 		// Apply damage and play a sound to indicate we're being hurt
 		UGameplayStatics::ApplyDamage(Hit.GetActor(), FlareDamage * DeltaTime, GetInstigatorController(), this, DamageType);
-		if (!IsBurnSoundValid()) {
-			BurningSoundComponent = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), BurningSound, GetActorLocation(), FRotator::ZeroRotator, 0.5f);
-		}
-		else if (IsBurnSoundValid() && !BurningSoundComponent->IsPlaying()) {
-			BurningSoundComponent->Play();
+		if (BurningSoundComponent == nullptr) {
+			BurningSoundComponent = UGameplayStatics::SpawnSound2D(GetWorld(), BurningSound);
 		}
 	}
-	else if (IsBurnSoundValid() && BurningSoundComponent->IsPlaying()) {
-		BurningSoundComponent->Stop();
+	else if (BurningSoundComponent != nullptr && BurningSoundComponent->IsPlaying()) {
+		BurningSoundComponent->DestroyComponent();
+		BurningSoundComponent = nullptr;
 	}
 }
 
@@ -150,15 +153,11 @@ void AMainCharacter::RestartLevel()
 	UGameplayStatics::OpenLevel(GetWorld(), "GameMap", true);
 }
 
-bool AMainCharacter::IsBurnSoundValid() const
-{
-	return BurningSoundComponent->IsValidLowLevel() && IsValid(BurningSoundComponent) && BurningSoundComponent != nullptr && BurningSoundComponent ;
-}
-
 void AMainCharacter::HandleGameOver(bool PlayerDied) 
 {
 	IsAlive = !PlayerDied;
 	GameOver = true;
+	NotifyHUDGameOver();
 }
 
 bool AMainCharacter::GetIsAlive() const
