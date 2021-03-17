@@ -15,6 +15,7 @@ class FIRSTROCKFROMTHESUN_API ABP_GameMode : public AGameModeBase
 
 public:
 	ABP_GameMode();
+	virtual void Tick(float DeltaTime) override;
 	void HandleGameOver(bool PlayerDied);
 	bool ShouldFinalMissionComplete() const;
 	void MissionCompleted();
@@ -38,8 +39,6 @@ private:
 	float SolarFlareCountdown = 5.f;
 	UPROPERTY(EditDefaultsOnly)
 	float SolarFlareDuration = 10.f;
-	UPROPERTY(EditDefaultsOnly)
-	float SolarFlareTickFrequency = 0.3f;
 	UPROPERTY(EditAnywhere, Category="Effects")
 	USoundBase* AlarmSound;
 	UPROPERTY(EditAnywhere, Category="Effects")
@@ -49,7 +48,6 @@ private:
 	AMainCharacter* Player;
 	TArray<AMissionPoint*> MissionPoints;
 	FTimerHandle FlareTimerHandle;
-	FTimerHandle PlayerRaycastTimerHandle;
 	UAudioComponent* AlarmSoundComponent;
 	UAudioComponent* FlareSoundComponent;
 	bool GameStarted = false;
@@ -65,7 +63,6 @@ private:
 	void StartDowntime();
 	void StartCountdown();
 	void StartSolarFlare();
-	void DoSolarFlare();
 	void EndSolarFlare();
 
 };
